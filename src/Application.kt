@@ -40,7 +40,9 @@ fun Application.module(testing: Boolean = false) {
             )
         )*/
 
-        println(getAnalyticsByDate(client, GetAnalyticsParams(null, null, null, null)))
+        //println(getAnalyticsByDate(client, GetAnalyticsParams(null, null, null, null)))
+
+        println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
     }
 }
 
@@ -161,6 +163,54 @@ suspend fun getContactsJson(client: HttpClient): List<Contact> {
 suspend fun getHooks(client: HttpClient): List<Hook> {
     return client.get {
         url("https://gateway.sms77.io/api/hooks?action=${HooksAction.Read}")
+    }
+}
+
+suspend fun getJournalInbound(client: HttpClient, params: GetJournalParams): List<JournalInbound> {
+    return client.get {
+        url(
+            toQueryString(
+                "journal?type=${JournalType.Inbound}",
+                GetJournalParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getJournalOutbound(client: HttpClient, params: GetJournalParams): List<JournalOutbound> {
+    return client.get {
+        url(
+            toQueryString(
+                "journal?type=${JournalType.Outbound}",
+                GetJournalParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getJournalReplies(client: HttpClient, params: GetJournalParams): List<JournalReplies> {
+    return client.get {
+        url(
+            toQueryString(
+                "journal?type=${JournalType.Replies}",
+                GetJournalParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getJournalVoice(client: HttpClient, params: GetJournalParams): List<JournalVoice> {
+    return client.get {
+        url(
+            toQueryString(
+                "journal?type=${JournalType.Voice}",
+                GetJournalParams::class.memberProperties,
+                params
+            )
+        )
     }
 }
 
@@ -318,6 +368,78 @@ object HooksAction {
     const val Subscribe = "subscribe"
     const val Unsubscribe = "unsubscribe"
 }
+
+interface JournalBase {
+    val from: String
+    val id: String
+    val price: String
+    val text: String
+    val timestamp: String
+    val to: String
+}
+
+object JournalType {
+    const val Outbound = "outbound"
+    const val Inbound = "inbound"
+    const val Voice = "voice"
+    const val Replies = "replies"
+}
+
+data class GetJournalParams(
+    val date_from: String?,
+    val date_to: String?,
+    val id: Int?,
+    val state: String?,
+    val to: String?
+)
+
+data class JournalOutbound(
+    override val from: String,
+    override val id: String,
+    override val price: String,
+    override val text: String,
+    override val timestamp: String,
+    override val to: String,
+    val connection: String,
+    val dlr: String?,
+    val dlr_timestamp: String?,
+    val foreign_id: String?,
+    val label: String?,
+    val latency: String?,
+    val mccmnc: String?,
+    val type: String?
+) : JournalBase
+
+data class JournalVoice(
+    override val from: String,
+    override val id: String,
+    override val price: String,
+    override val text: String,
+    override val timestamp: String,
+    override val to: String,
+    val duration: String,
+    val error: String,
+    val status: String,
+    val xml: Boolean,
+) : JournalBase
+
+data class JournalInbound(
+    override val from: String,
+    override val id: String,
+    override val price: String,
+    override val text: String,
+    override val timestamp: String,
+    override val to: String,
+) : JournalBase
+
+data class JournalReplies(
+    override val from: String,
+    override val id: String,
+    override val price: String,
+    override val text: String,
+    override val timestamp: String,
+    override val to: String,
+) : JournalBase
 
 class SubscribeHookParams(
     event_type: HookEventType,
