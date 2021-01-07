@@ -30,7 +30,7 @@ fun Application.module(testing: Boolean = false) {
         //println(getContactsCsv(client))
         //println(getContactsJson(client))
 
-        println(
+/*        println(
             subscribeHook(
                 client, SubscribeHookParams(
                     event_type = HookEventType.SmsInbound,
@@ -38,7 +38,9 @@ fun Application.module(testing: Boolean = false) {
                     target_url = "http://my.tld/kotlin/${DateTimeFormatter.ISO_INSTANT.format(Instant.now())}"
                 )
             )
-        )
+        )*/
+
+        println(getAnalyticsByDate(client, GetAnalyticsParams(null, null, null, null)))
     }
 }
 
@@ -87,6 +89,54 @@ suspend fun deleteContactCsv(client: HttpClient, params: DeleteContactParams): S
 suspend fun deleteContactJson(client: HttpClient, params: DeleteContactParams): DeleteContactResponse {
     return client.get {
         url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Delete}&json=1&id=${params.id}")
+    }
+}
+
+suspend fun getAnalyticsByCountry(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByCountry> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Country}",
+                GetAnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getAnalyticsByDate(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByDate> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Date}",
+                GetAnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getAnalyticsByLabel(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByLabel> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Label}",
+                GetAnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getAnalyticsBySubaccount(client: HttpClient, params: GetAnalyticsParams): List<AnalyticBySubaccount> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Subaccount}",
+                GetAnalyticsParams::class.memberProperties,
+                params
+            )
+        )
     }
 }
 
@@ -171,11 +221,79 @@ object ContactsAction {
     const val Write = "write"
 }
 
+object AnalyticsGroupBy {
+    const val Date = "date"
+    const val Label = "label"
+    const val Subaccount = "subaccount"
+    const val Country = "country"
+}
+
+interface AnalyticBase {
+    val direct: Int
+    val economy: Int
+    val hlr: Int
+    val inbound: Int
+    val mnp: Int
+    val usage_eur: Float
+    val voice: Int
+}
+
+data class AnalyticByCountry(
+    override val direct: Int,
+    override val economy: Int,
+    override val hlr: Int,
+    override val inbound: Int,
+    override val mnp: Int,
+    override val usage_eur: Float,
+    override val voice: Int,
+    val country: String,
+) : AnalyticBase
+
+data class AnalyticByDate(
+    override val direct: Int,
+    override val economy: Int,
+    override val hlr: Int,
+    override val inbound: Int,
+    override val mnp: Int,
+    override val usage_eur: Float,
+    override val voice: Int,
+    val date: String,
+) : AnalyticBase
+
+data class AnalyticBySubaccount(
+    override val direct: Int,
+    override val economy: Int,
+    override val hlr: Int,
+    override val inbound: Int,
+    override val mnp: Int,
+    override val usage_eur: Float,
+    override val voice: Int,
+    val account: String,
+) : AnalyticBase
+
+data class AnalyticByLabel(
+    override val direct: Int,
+    override val economy: Int,
+    override val hlr: Int,
+    override val inbound: Int,
+    override val mnp: Int,
+    override val usage_eur: Float,
+    override val voice: Int,
+    val label: String,
+) : AnalyticBase
+
 data class CreateContactResponse(val `return`: String, val id: String)
 data class DeleteContactParams(val id: Number)
 data class DeleteContactResponse(val `return`: String)
 data class EditContactParams(val id: Number, val email: String?, val empfaenger: String?, val nick: String?)
 data class EditContactResponse(val `return`: String)
+data class GetAnalyticsParams(
+    val start: String?,
+    val end: String?,
+    val label: String?,
+    val subaccounts: String?,
+)
+
 data class Hook(
     val created: String,
     val event_type: HookEventType,
