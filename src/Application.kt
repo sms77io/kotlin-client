@@ -65,6 +65,7 @@ fun Application.module(testing: Boolean = false) {
                 )
             )
         )*/
+        println(validateForVoice(client, ValidateForVoiceParams("491771783130", null)))
     }
 }
 
@@ -368,6 +369,18 @@ suspend fun status(client: HttpClient, params: StatusParams): String {
             toQueryString(
                 "status?",
                 StatusParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun validateForVoice(client: HttpClient, params: ValidateForVoiceParams): ValidateForVoiceResponse {
+    return client.post {
+        url(
+            toQueryString(
+                "validate_for_voice?",
+                ValidateForVoiceParams::class.memberProperties,
                 params
             )
         )
@@ -847,3 +860,17 @@ class SubscribeHookParams(
 data class SubscribeHookResponse(val success: Boolean, val id: Number?)
 data class UnsubscribeHookParams(val id: Number)
 data class UnsubscribeHookResponse(val success: Boolean)
+data class ValidateForVoiceParams(
+    val number: String,
+    val callback: String?,
+)
+
+data class ValidateForVoiceResponse(
+    val code: String?,
+    val error: String?,
+    val formatted_output: String?,
+    val id: Int?,
+    val sender: String?,
+    val success: Boolean,
+    val voice: Boolean?
+)
