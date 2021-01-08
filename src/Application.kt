@@ -42,7 +42,8 @@ fun Application.module(testing: Boolean = false) {
 
         //println(getAnalyticsByDate(client, GetAnalyticsParams(null, null, null, null)))
 
-        println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
+        //println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
+        //println(lookupMnpJson(client, LookupParams("491771783130")))
     }
 }
 
@@ -232,6 +233,66 @@ suspend fun unsubscribeHook(client: HttpClient, params: UnsubscribeHookParams): 
     }
 }
 
+suspend fun lookupCnam(client: HttpClient, params: LookupParams): LookupCnamResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "lookup?type=${LookupType.CallerNameDelivery}&number=${params.number}",
+                LookupParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun lookupFormat(client: HttpClient, params: LookupParams): LookupFormatResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "lookup?type=${LookupType.Format}&number=${params.number}",
+                LookupParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun lookupHlr(client: HttpClient, params: LookupParams): LookupHlrResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "lookup?type=${LookupType.HomeLocationRegister}&number=${params.number}",
+                LookupParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun lookupMnp(client: HttpClient, params: LookupParams): String {
+    return client.get {
+        url(
+            toQueryString(
+                "lookup?type=${LookupType.MobileNumberPortability}&number=${params.number}",
+                LookupParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun lookupMnpJson(client: HttpClient, params: LookupParams): LookupMnpResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "lookup?type=${LookupType.MobileNumberPortability}&number=${params.number}&json=1",
+                LookupParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
 fun getClient(): HttpClient {
     return HttpClient(CIO) {
         install(JsonFeature) {
@@ -331,6 +392,135 @@ data class AnalyticByLabel(
     override val voice: Int,
     val label: String,
 ) : AnalyticBase
+
+object LookupType {
+    const val CallerNameDelivery = "cnam"
+    const val Format = "format"
+    const val HomeLocationRegister = "hlr"
+    const val MobileNumberPortability = "mnp"
+}
+
+data class LookupParams(val number: String)
+data class LookupCnamResponse(
+    val code: String,
+    val name: String, // callerID
+    val number: String,
+    val success: String
+)
+
+data class LookupFormatResponse(
+    val national: String,
+    val carrier: String,
+    val country_code: String,
+    val country_iso: String,
+    val country_name: String,
+    val international: String,
+    val international_formatted: String,
+    val network_type: LookupNetworkType,
+    val success: Boolean
+)
+
+data class LookupMnp(
+    val country: String,
+    val international_formatted: String,
+    val isPorted: Boolean,
+    val mccmnc: String,
+    val national_format: String,
+    val network: String,
+    val number: String
+)
+
+data class LookupMnpResponse(
+    val code: Int,
+    val mnp: LookupMnp,
+    val price: Float,
+    val success: Boolean
+)
+
+data class HlrCarrier(
+    val country: String,
+    val name: String,
+    val network_code: String,
+    val network_type: LookupNetworkType
+)
+
+enum class LookupHlrPorted {
+    unknown,
+    ported,
+    not_ported,
+    assumed_not_ported,
+    assumed_ported,
+}
+
+enum class LookupHlrReachable {
+    unknown,
+    reachable,
+    undeliverable,
+    absent,
+    bad_number,
+    blacklisted
+}
+
+data class LookupHlrRoaming(
+    val roaming_country_code: String,
+    val roaming_network_code: String,
+    val roaming_network_name: String,
+    val status: LookupHlrStatusCode
+)
+
+enum class LookupHlrStatusCode {
+    not_roaming,
+    roaming,
+    unknown
+}
+
+data class LookupHlrResponse(
+    val country_code: String,
+    val country_code_iso3: String?,
+    val country_name: String,
+    val country_prefix: String,
+    val current_carrier: HlrCarrier,
+    val gsm_code: String,
+    val gsm_message: String,
+    val international_format_number: String,
+    val international_formatted: String,
+    val lookup_outcome: Int,
+    val lookup_outcome_message: String,
+    val national_format_number: String,
+    val original_carrier: HlrCarrier,
+    val ported: LookupHlrPorted,
+    val reachable: LookupHlrReachable,
+    val roaming: LookupHlrRoaming,
+    val status: Boolean,
+    val status_message: LookupHlrStatusMessage,
+    val valid_number: LookupHlrValidNumber
+)
+
+enum class LookupHlrValidNumber {
+    unknown,
+    valid,
+    not_valid
+}
+
+enum class LookupHlrStatusMessage {
+    error,
+    success
+}
+
+enum class LookupNetworkType {
+    fixed_line,
+    fixed_line_or_mobile,
+    mobile,
+    pager,
+    personal_number,
+    premium_rate,
+    shared_cost,
+    toll_free,
+    uan,
+    unknown,
+    voicemail,
+    voip
+}
 
 data class CreateContactResponse(val `return`: String, val id: String)
 data class DeleteContactParams(val id: Number)
