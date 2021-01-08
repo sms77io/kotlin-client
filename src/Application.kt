@@ -339,7 +339,7 @@ suspend fun getPricingJson(client: HttpClient, params: PricingParams): PricingRe
 }
 
 suspend fun sms(client: HttpClient, params: SmsParams): String {
-    return client.get {
+    return client.post {
         url(
             toQueryString(
                 "sms",
@@ -351,11 +351,23 @@ suspend fun sms(client: HttpClient, params: SmsParams): String {
 }
 
 suspend fun smsJson(client: HttpClient, params: SmsJsonParams): SmsResponse {
-    return client.get {
+    return client.post {
         url(
             toQueryString(
                 "sms?json=1",
                 SmsJsonParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun status(client: HttpClient, params: StatusParams): String {
+    return client.get {
+        url(
+            toQueryString(
+                "status?",
+                StatusParams::class.memberProperties,
                 params
             )
         )
@@ -781,8 +793,7 @@ data class SmsJsonParams(
     override val utf8: Boolean?,
     override val ttl: Int?,
     override val performance_tracking: Boolean?,
-
-    ) : SmsBaseParams
+) : SmsBaseParams
 
 enum class SmsEncoding {
     gsm,
@@ -816,6 +827,8 @@ enum class SmsType {
     direct,
     economy
 }
+
+data class StatusParams(val msg_id: String)
 
 enum class StringBool {
     `true`,
