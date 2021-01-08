@@ -45,6 +45,26 @@ fun Application.module(testing: Boolean = false) {
         //println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
         //println(lookupMnpJson(client, LookupParams("491771783130")))
         //println(getPricingJson(client, PricingParams("de")))
+/*        println(
+            smsJson(
+                client, SmsJsonParams(
+                    debug = false,
+                    delay = null,
+                    flash = false,
+                    foreign_id = null,
+                    from = null,
+                    label = null,
+                    no_reload = false,
+                    text = "HI2U!",
+                    to = "491771783130!",
+                    unicode = false,
+                    udh = null,
+                    utf8 = false,
+                    ttl = null,
+                    performance_tracking = false,
+                )
+            )
+        )*/
     }
 }
 
@@ -238,7 +258,7 @@ suspend fun lookupCnam(client: HttpClient, params: LookupParams): LookupCnamResp
     return client.get {
         url(
             toQueryString(
-                "lookup?type=${LookupType.CallerNameDelivery}&number=${params.number}",
+                "lookup?type=${LookupType.CallerNameDelivery}",
                 LookupParams::class.memberProperties,
                 params
             )
@@ -250,7 +270,7 @@ suspend fun lookupFormat(client: HttpClient, params: LookupParams): LookupFormat
     return client.get {
         url(
             toQueryString(
-                "lookup?type=${LookupType.Format}&number=${params.number}",
+                "lookup?type=${LookupType.Format}",
                 LookupParams::class.memberProperties,
                 params
             )
@@ -262,7 +282,7 @@ suspend fun lookupHlr(client: HttpClient, params: LookupParams): LookupHlrRespon
     return client.get {
         url(
             toQueryString(
-                "lookup?type=${LookupType.HomeLocationRegister}&number=${params.number}",
+                "lookup?type=${LookupType.HomeLocationRegister}",
                 LookupParams::class.memberProperties,
                 params
             )
@@ -274,7 +294,7 @@ suspend fun lookupMnp(client: HttpClient, params: LookupParams): String {
     return client.get {
         url(
             toQueryString(
-                "lookup?type=${LookupType.MobileNumberPortability}&number=${params.number}",
+                "lookup?type=${LookupType.MobileNumberPortability}",
                 LookupParams::class.memberProperties,
                 params
             )
@@ -286,7 +306,7 @@ suspend fun lookupMnpJson(client: HttpClient, params: LookupParams): LookupMnpRe
     return client.get {
         url(
             toQueryString(
-                "lookup?type=${LookupType.MobileNumberPortability}&number=${params.number}&json=1",
+                "lookup?type=${LookupType.MobileNumberPortability}&json=1",
                 LookupParams::class.memberProperties,
                 params
             )
@@ -298,7 +318,7 @@ suspend fun getPricingCsv(client: HttpClient, params: PricingParams): String {
     return client.get {
         url(
             toQueryString(
-                "pricing?format=${PricingFormat.Csv}&country=${params.country}",
+                "pricing?format=${PricingFormat.Csv}",
                 PricingParams::class.memberProperties,
                 params
             )
@@ -310,8 +330,32 @@ suspend fun getPricingJson(client: HttpClient, params: PricingParams): PricingRe
     return client.get {
         url(
             toQueryString(
-                "pricing?format=${PricingFormat.Json}&country=${params.country}",
+                "pricing?format=${PricingFormat.Json}",
                 PricingParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun sms(client: HttpClient, params: SmsParams): String {
+    return client.get {
+        url(
+            toQueryString(
+                "sms",
+                SmsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun smsJson(client: HttpClient, params: SmsJsonParams): SmsResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "sms?json=1",
+                SmsJsonParams::class.memberProperties,
                 params
             )
         )
@@ -433,7 +477,6 @@ data class LookupCnamResponse(
     val success: String
 )
 
-data class PricingParams(val country: String?)
 data class LookupFormatResponse(
     val national: String,
     val carrier: String,
@@ -673,6 +716,8 @@ data class PricingCountryNetwork(
     val price: Float
 )
 
+data class PricingParams(val country: String?)
+
 data class PricingResponse(
     val countCountries: Int,
     val countNetworks: Int,
@@ -682,6 +727,99 @@ data class PricingResponse(
 object PricingFormat {
     const val Csv = "csv"
     const val Json = "json"
+}
+
+interface SmsBaseParams {
+    val debug: Boolean?
+    val delay: String?
+    val flash: Boolean?
+    val foreign_id: String?
+    val from: String?
+    val label: String?
+    val no_reload: Boolean?
+    val text: String
+    val to: String
+    val unicode: Boolean?
+    val udh: String?
+    val utf8: Boolean?
+    val ttl: Int?
+    val performance_tracking: Boolean?
+}
+
+data class SmsParams(
+    override val debug: Boolean?,
+    override val delay: String?,
+    override val flash: Boolean?,
+    override val foreign_id: String?,
+    override val from: String?,
+    override val label: String?,
+    override val no_reload: Boolean?,
+    override val text: String,
+    override val to: String,
+    override val unicode: Boolean?,
+    override val udh: String?,
+    override val utf8: Boolean?,
+    override val ttl: Int?,
+    override val performance_tracking: Boolean?,
+    val details: Boolean?,
+    val return_msg_id: Boolean?
+
+) : SmsBaseParams
+
+data class SmsJsonParams(
+    override val debug: Boolean?,
+    override val delay: String?,
+    override val flash: Boolean?,
+    override val foreign_id: String?,
+    override val from: String?,
+    override val label: String?,
+    override val no_reload: Boolean?,
+    override val text: String,
+    override val to: String,
+    override val unicode: Boolean?,
+    override val udh: String?,
+    override val utf8: Boolean?,
+    override val ttl: Int?,
+    override val performance_tracking: Boolean?,
+
+    ) : SmsBaseParams
+
+enum class SmsEncoding {
+    gsm,
+    ucs2
+}
+
+data class SmsMessage(
+    val encoding: SmsEncoding,
+    val error: String?,
+    val error_text: String?,
+    val id: String?,
+    val messages: List<String>?,
+    val parts: Int,
+    val price: Float,
+    val recipient: String,
+    val sender: String,
+    val success: Boolean,
+    val text: String
+)
+
+data class SmsResponse(
+    val debug: StringBool,
+    val balance: Float,
+    val messages: List<SmsMessage>,
+    val sms_type: SmsType,
+    val success: String,
+    val total_price: Float
+)
+
+enum class SmsType {
+    direct,
+    economy
+}
+
+enum class StringBool {
+    `true`,
+    `false`
 }
 
 class SubscribeHookParams(
