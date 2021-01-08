@@ -65,7 +65,17 @@ fun Application.module(testing: Boolean = false) {
                 )
             )
         )*/
-        println(validateForVoice(client, ValidateForVoiceParams("491771783130", null)))
+        //println(validateForVoice(client, ValidateForVoiceParams("491771783130", null)))
+        println(
+            voice(
+                client, VoiceParams(
+                    from = "Kotlin-Client",
+                    text = "HI2U",
+                    to = "491771783130",
+                    xml = false
+                )
+            )
+        )
     }
 }
 
@@ -381,6 +391,18 @@ suspend fun validateForVoice(client: HttpClient, params: ValidateForVoiceParams)
             toQueryString(
                 "validate_for_voice?",
                 ValidateForVoiceParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun voice(client: HttpClient, params: VoiceParams): String {
+    return client.post {
+        url(
+            toQueryString(
+                "voice?",
+                VoiceParams::class.memberProperties,
                 params
             )
         )
@@ -873,4 +895,11 @@ data class ValidateForVoiceResponse(
     val sender: String?,
     val success: Boolean,
     val voice: Boolean?
+)
+
+data class VoiceParams(
+    val from: String?,
+    val text: String,
+    val to: String,
+    val xml: Boolean?
 )
