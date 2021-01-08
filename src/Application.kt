@@ -44,6 +44,7 @@ fun Application.module(testing: Boolean = false) {
 
         //println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
         //println(lookupMnpJson(client, LookupParams("491771783130")))
+        //println(getPricingJson(client, PricingParams("de")))
     }
 }
 
@@ -293,6 +294,30 @@ suspend fun lookupMnpJson(client: HttpClient, params: LookupParams): LookupMnpRe
     }
 }
 
+suspend fun getPricingCsv(client: HttpClient, params: PricingParams): String {
+    return client.get {
+        url(
+            toQueryString(
+                "pricing?format=${PricingFormat.Csv}&country=${params.country}",
+                PricingParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun getPricingJson(client: HttpClient, params: PricingParams): PricingResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "pricing?format=${PricingFormat.Json}&country=${params.country}",
+                PricingParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
 fun getClient(): HttpClient {
     return HttpClient(CIO) {
         install(JsonFeature) {
@@ -408,6 +433,7 @@ data class LookupCnamResponse(
     val success: String
 )
 
+data class PricingParams(val country: String?)
 data class LookupFormatResponse(
     val national: String,
     val carrier: String,
@@ -630,6 +656,33 @@ data class JournalReplies(
     override val timestamp: String,
     override val to: String,
 ) : JournalBase
+
+data class PricingCountry(
+    val countryCode: String,
+    val countryName: String,
+    val countryPrefix: String,
+    val networks: List<PricingCountryNetwork>
+)
+
+data class PricingCountryNetwork(
+    val comment: String,
+    val features: List<String>,
+    val mcc: String,
+    val mncs: List<String>,
+    val networkName: String,
+    val price: Float
+)
+
+data class PricingResponse(
+    val countCountries: Int,
+    val countNetworks: Int,
+    val countries: List<PricingCountry>
+)
+
+object PricingFormat {
+    const val Csv = "csv"
+    const val Json = "json"
+}
 
 class SubscribeHookParams(
     event_type: HookEventType,
