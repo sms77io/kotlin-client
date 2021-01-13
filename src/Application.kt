@@ -1,97 +1,84 @@
 package com.sms77
 
-import com.google.gson.annotations.JsonAdapter
-import com.google.gson.annotations.SerializedName
-import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.*
 import io.ktor.client.features.logging.*
+import io.ktor.client.request.*
 import io.ktor.http.*
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
-import kotlin.reflect.KType
 import kotlin.reflect.full.memberProperties
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+const val BASE_URL = "https://gateway.sms77.io/api/"
 
-@Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
-    val client = getClient()
-
-    runBlocking {
-        //println("balance: ${balance(client)}")
-        //println(getContactsCsv(client))
-        //println(getContactsJson(client))
-
-/*        println(
-            subscribeHook(
-                client, SubscribeHookParams(
-                    event_type = HookEventType.SmsInbound,
-                    request_method = HookRequestMethod.Get,
-                    target_url = "http://my.tld/kotlin/${DateTimeFormatter.ISO_INSTANT.format(Instant.now())}"
-                )
-            )
-        )*/
-
-        //println(getAnalyticsByDate(client, GetAnalyticsParams(null, null, null, null)))
-
-        //println(getJournalInbound(client, GetJournalParams(null, null, null, null, null)))
-        //println(lookupMnpJson(client, LookupParams("491771783130")))
-        //println(getPricingJson(client, PricingParams("de")))
-/*        println(
-            smsJson(
-                client, SmsJsonParams(
-                    debug = false,
-                    delay = null,
-                    flash = false,
-                    foreign_id = null,
-                    from = null,
-                    label = null,
-                    no_reload = false,
-                    text = "HI2U!",
-                    to = "491771783130!",
-                    unicode = false,
-                    udh = null,
-                    utf8 = false,
-                    ttl = null,
-                    performance_tracking = false,
-                )
-            )
-        )*/
-        //println(validateForVoice(client, ValidateForVoiceParams("491771783130", null)))
-        println(
-            voice(
-                client, VoiceParams(
-                    from = "Kotlin-Client",
-                    text = "HI2U",
-                    to = "491771783130",
-                    xml = false
-                )
+suspend fun analyticsByCountry(client: HttpClient, params: AnalyticsParams): List<AnalyticByCountry> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Country}",
+                AnalyticsParams::class.memberProperties,
+                params
             )
         )
     }
 }
 
-suspend fun createContactCsv(client: HttpClient): String {
+suspend fun analyticsByDate(client: HttpClient, params: AnalyticsParams): List<AnalyticByDate> {
     return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Write}")
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Date}",
+                AnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun analyticsByLabel(client: HttpClient, params: AnalyticsParams): List<AnalyticByLabel> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Label}",
+                AnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun analyticsBySubaccount(client: HttpClient, params: AnalyticsParams): List<AnalyticBySubaccount> {
+    return client.get {
+        url(
+            toQueryString(
+                "analytics?group_by=${AnalyticsGroupBy.Subaccount}",
+                AnalyticsParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun balance(client: HttpClient): Float {
+    return client.get<String> {
+        url("${BASE_URL}balance")
+    }.toFloat()
+}
+
+suspend fun createContact(client: HttpClient): String {
+    return client.get {
+        url("${BASE_URL}contacts?action=${ContactsAction.Write}")
     }
 }
 
 suspend fun createContactJson(client: HttpClient): CreateContactResponse {
     return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Write}&json=1")
+        url("${BASE_URL}contacts?action=${ContactsAction.Write}&json=1")
     }
 }
 
-suspend fun editContactCsv(client: HttpClient, params: EditContactParams): String {
+suspend fun editContact(client: HttpClient, params: EditContactParams): String {
     return client.get {
         url(
             toQueryString(
@@ -115,132 +102,78 @@ suspend fun editContactJson(client: HttpClient, params: EditContactParams): Edit
     }
 }
 
-suspend fun deleteContactCsv(client: HttpClient, params: DeleteContactParams): String {
+suspend fun deleteContact(client: HttpClient, params: DeleteContactParams): String {
     return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Delete}&id=${params.id}")
+        url("${BASE_URL}contacts?action=${ContactsAction.Delete}&id=${params.id}")
     }
 }
 
 suspend fun deleteContactJson(client: HttpClient, params: DeleteContactParams): DeleteContactResponse {
     return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Delete}&json=1&id=${params.id}")
+        url("${BASE_URL}contacts?action=${ContactsAction.Delete}&json=1&id=${params.id}")
     }
 }
 
-suspend fun getAnalyticsByCountry(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByCountry> {
+suspend fun getContacts(client: HttpClient): String {
     return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Country}",
-                GetAnalyticsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun getAnalyticsByDate(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByDate> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Date}",
-                GetAnalyticsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun getAnalyticsByLabel(client: HttpClient, params: GetAnalyticsParams): List<AnalyticByLabel> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Label}",
-                GetAnalyticsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun getAnalyticsBySubaccount(client: HttpClient, params: GetAnalyticsParams): List<AnalyticBySubaccount> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Subaccount}",
-                GetAnalyticsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun getBalance(client: HttpClient): Float {
-    return client.get<String> {
-        url("https://gateway.sms77.io/api/balance")
-    }.toFloat()
-}
-
-suspend fun getContactsCsv(client: HttpClient): String {
-    return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Read}")
+        url("${BASE_URL}contacts?action=${ContactsAction.Read}")
     }
 }
 
 suspend fun getContactsJson(client: HttpClient): List<Contact> {
     return client.get {
-        url("https://gateway.sms77.io/api/contacts?action=${ContactsAction.Read}&json=1")
+        url("${BASE_URL}contacts?action=${ContactsAction.Read}&json=1")
     }
 }
 
-suspend fun getHooks(client: HttpClient): List<Hook> {
+suspend fun getHooks(client: HttpClient): GetHooksResponse {
     return client.get {
-        url("https://gateway.sms77.io/api/hooks?action=${HooksAction.Read}")
+        url("${BASE_URL}hooks?action=${HooksAction.Read}")
     }
 }
 
-suspend fun getJournalInbound(client: HttpClient, params: GetJournalParams): List<JournalInbound> {
+suspend fun journalInbound(client: HttpClient, params: JournalParams): List<JournalInbound> {
     return client.get {
         url(
             toQueryString(
                 "journal?type=${JournalType.Inbound}",
-                GetJournalParams::class.memberProperties,
+                JournalParams::class.memberProperties,
                 params
             )
         )
     }
 }
 
-suspend fun getJournalOutbound(client: HttpClient, params: GetJournalParams): List<JournalOutbound> {
+suspend fun journalOutbound(client: HttpClient, params: JournalParams): List<JournalOutbound> {
     return client.get {
         url(
             toQueryString(
                 "journal?type=${JournalType.Outbound}",
-                GetJournalParams::class.memberProperties,
+                JournalParams::class.memberProperties,
                 params
             )
         )
     }
 }
 
-suspend fun getJournalReplies(client: HttpClient, params: GetJournalParams): List<JournalReplies> {
+suspend fun journalReplies(client: HttpClient, params: JournalParams): List<JournalReplies> {
     return client.get {
         url(
             toQueryString(
                 "journal?type=${JournalType.Replies}",
-                GetJournalParams::class.memberProperties,
+                JournalParams::class.memberProperties,
                 params
             )
         )
     }
 }
 
-suspend fun getJournalVoice(client: HttpClient, params: GetJournalParams): List<JournalVoice> {
+suspend fun journalVoice(client: HttpClient, params: JournalParams): List<JournalVoice> {
     return client.get {
         url(
             toQueryString(
                 "journal?type=${JournalType.Voice}",
-                GetJournalParams::class.memberProperties,
+                JournalParams::class.memberProperties,
                 params
             )
         )
@@ -261,7 +194,7 @@ suspend fun subscribeHook(client: HttpClient, params: SubscribeHookParams): Subs
 
 suspend fun unsubscribeHook(client: HttpClient, params: UnsubscribeHookParams): UnsubscribeHookResponse {
     return client.post {
-        url("https://gateway.sms77.io/api/hooks?action=${HooksAction.Unsubscribe}&id=${params.id}")
+        url("${BASE_URL}hooks?action=${HooksAction.Unsubscribe}&id=${params.id}")
     }
 }
 
@@ -325,7 +258,19 @@ suspend fun lookupMnpJson(client: HttpClient, params: LookupParams): LookupMnpRe
     }
 }
 
-suspend fun getPricingCsv(client: HttpClient, params: PricingParams): String {
+suspend fun pricing(client: HttpClient, params: PricingParams): PricingResponse {
+    return client.get {
+        url(
+            toQueryString(
+                "pricing?",
+                PricingParams::class.memberProperties,
+                params
+            )
+        )
+    }
+}
+
+suspend fun pricingCsv(client: HttpClient, params: PricingParams): String {
     return client.get {
         url(
             toQueryString(
@@ -337,23 +282,11 @@ suspend fun getPricingCsv(client: HttpClient, params: PricingParams): String {
     }
 }
 
-suspend fun getPricingJson(client: HttpClient, params: PricingParams): PricingResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "pricing?format=${PricingFormat.Json}",
-                PricingParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
 suspend fun sms(client: HttpClient, params: SmsParams): String {
     return client.post {
         url(
             toQueryString(
-                "sms",
+                "sms?",
                 SmsParams::class.memberProperties,
                 params
             )
@@ -409,26 +342,30 @@ suspend fun voice(client: HttpClient, params: VoiceParams): String {
     }
 }
 
-fun getClient(): HttpClient {
+fun getClient(params: ClientParams): HttpClient {
     return HttpClient(CIO) {
         install(JsonFeature) {
             serializer = GsonSerializer()
             acceptContentTypes = acceptContentTypes +
                     ContentType("text", "plain")
         }
-        install(Logging) {
-            level = LogLevel.HEADERS
+
+        if (params.debug) {
+            install(Logging) {
+                level = LogLevel.INFO
+            }
         }
+
         defaultRequest {
-            developmentMode = true
-            header("sentWith", "Kotlin")
-            header("Authorization", "Basic ${System.getenv("SMS77_DUMMY_API_KEY")}")
+            developmentMode = params.debug
+            header("sentWith", params.sentWith)
+            header("Authorization", "Basic ${params.apiKey}")
         }
     }
 }
 
 private inline fun <reified T> toQueryString(endpoint: String, props: Collection<KProperty1<T, *>>, params: T): String {
-    var url = "https://gateway.sms77.io/api/${endpoint}"
+    var url = "${BASE_URL}${endpoint}"
 
     for (prop in props) {
         val value = prop.get(params)
@@ -441,7 +378,16 @@ private inline fun <reified T> toQueryString(endpoint: String, props: Collection
     return url
 }
 
+data class ClientParams(
+    val apiKey: String = System.getenv("SMS77_API_KEY"),
+    val debug: Boolean = false,
+    val dummy: Boolean = false,
+    val sentWith: String = "Kotlin",
+    val testing: Boolean = false,
+)
+
 data class Contact(val ID: String, val Name: String, val Number: String)
+
 object ContactsAction {
     const val Delete = "del"
     const val Read = "read"
@@ -509,6 +455,8 @@ data class AnalyticByLabel(
     val label: String,
 ) : AnalyticBase
 
+data class GetHooksResponse(val success: Boolean, val hooks: List<Hook>)
+
 object LookupType {
     const val CallerNameDelivery = "cnam"
     const val Format = "format"
@@ -517,11 +465,12 @@ object LookupType {
 }
 
 data class LookupParams(val number: String)
+
 data class LookupCnamResponse(
     val code: String,
     val name: String, // callerID
     val number: String,
-    val success: String
+    val success: String,
 )
 
 data class LookupFormatResponse(
@@ -533,7 +482,7 @@ data class LookupFormatResponse(
     val international: String,
     val international_formatted: String,
     val network_type: LookupNetworkType,
-    val success: Boolean
+    val success: Boolean,
 )
 
 data class LookupMnp(
@@ -543,52 +492,49 @@ data class LookupMnp(
     val mccmnc: String,
     val national_format: String,
     val network: String,
-    val number: String
+    val number: String,
 )
 
 data class LookupMnpResponse(
     val code: Int,
     val mnp: LookupMnp,
     val price: Float,
-    val success: Boolean
+    val success: Boolean,
 )
 
 data class HlrCarrier(
     val country: String,
     val name: String,
     val network_code: String,
-    val network_type: LookupNetworkType
+    val network_type: String,
 )
 
-enum class LookupHlrPorted {
-    unknown,
-    ported,
-    not_ported,
-    assumed_not_ported,
-    assumed_ported,
-}
+abstract class LookupHlrPorted(val value: String)
+class UnknownLookupHlrPorted : LookupHlrPorted("unknown")
+class PortedLookupHlrReachable : LookupHlrPorted("ported")
+class NotPortedLookupHlrReachable : LookupHlrPorted("not_ported")
+class AssumedNotPortedLookupHlrReachable : LookupHlrPorted("assumed_not_ported")
+class AssumedPortedLookupHlrReachable : LookupHlrPorted("assumed_ported")
 
-enum class LookupHlrReachable {
-    unknown,
-    reachable,
-    undeliverable,
-    absent,
-    bad_number,
-    blacklisted
-}
+abstract class LookupHlrReachable(val value: String)
+class UnknownLookupHlrReachable : LookupHlrReachable("unknown")
+class ReachableLookupHlrReachable : LookupHlrReachable("reachable")
+class UndeliverableLookupHlrReachable : LookupHlrReachable("undeliverable")
+class AbsentLookupHlrReachable : LookupHlrReachable("absent")
+class BadNumberLookupHlrReachable : LookupHlrReachable("bad_number")
+class BlacklistedLookupHlrReachable : LookupHlrReachable("blacklisted")
 
 data class LookupHlrRoaming(
     val roaming_country_code: String,
     val roaming_network_code: String,
     val roaming_network_name: String,
-    val status: LookupHlrStatusCode
+    val status: String,
 )
 
-enum class LookupHlrStatusCode {
-    not_roaming,
-    roaming,
-    unknown
-}
+abstract class LookupHlrRoamingStatusCode(val value: String)
+class NotRoamingLookupHlrRoamingStatusCode : LookupHlrRoamingStatusCode("not_roaming")
+class RoamingLookupHlrRoamingStatusCode : LookupHlrRoamingStatusCode("roaming")
+class UnknownLookupHlrRoamingStatusCode : LookupHlrRoamingStatusCode("unknown")
 
 data class LookupHlrResponse(
     val country_code: String,
@@ -600,50 +546,52 @@ data class LookupHlrResponse(
     val gsm_message: String,
     val international_format_number: String,
     val international_formatted: String,
-    val lookup_outcome: Int,
+    val lookup_outcome: Any, // TODO: LookupOutcome | Boolean (false)
     val lookup_outcome_message: String,
     val national_format_number: String,
     val original_carrier: HlrCarrier,
-    val ported: LookupHlrPorted,
-    val reachable: LookupHlrReachable,
-    val roaming: LookupHlrRoaming,
+    val ported: String,
+    val reachable: String,
+    val roaming: Any, // TODO: LookupHlrRoaming | LookupHlrRoamingStatusCode
     val status: Boolean,
-    val status_message: LookupHlrStatusMessage,
-    val valid_number: LookupHlrValidNumber
+    val status_message: String,
+    val valid_number: String,
 )
 
-enum class LookupHlrValidNumber {
-    unknown,
-    valid,
-    not_valid
-}
+abstract class LookupHlrValidNumber(val value: String)
+class UnknownLookupHlrValidNumber : LookupHlrValidNumber("unknown")
+class ValidLookupHlrValidNumber : LookupHlrValidNumber("valid")
+class NotValidLookupHlrValidNumber : LookupHlrValidNumber("not_valid")
 
-enum class LookupHlrStatusMessage {
-    error,
-    success
-}
+abstract class LookupHlrStatusMessage(val value: String)
+class ErrorLookupHlrStatusMessage : LookupHlrStatusMessage("error")
+class SuccessLookupHlrStatusMessage : LookupHlrStatusMessage("success")
 
-enum class LookupNetworkType {
-    fixed_line,
-    fixed_line_or_mobile,
-    mobile,
-    pager,
-    personal_number,
-    premium_rate,
-    shared_cost,
-    toll_free,
-    uan,
-    unknown,
-    voicemail,
-    voip
-}
+abstract class LookupNetworkType(val value: String)
+class FixedLineLookupNetworkType : LookupNetworkType("fixed_line")
+class FixedLineOrMobileLookupNetworkType : LookupNetworkType("fixed_line_or_mobile")
+class MobileLookupNetworkType : LookupNetworkType("mobile")
+class PagerLookupNetworkType : LookupNetworkType("pager")
+class PersonalNumberLookupNetworkType : LookupNetworkType("personal_number")
+class PremiumRateLookupNetworkType : LookupNetworkType("premium_rate")
+class SharedCostLookupNetworkType : LookupNetworkType("shared_cost")
+class TollFreeLookupNetworkType : LookupNetworkType("toll_free")
+class UanLookupNetworkType : LookupNetworkType("uan")
+class UnknownLookupNetworkType : LookupNetworkType("unknown")
+class VoicemailLookupNetworkType : LookupNetworkType("voicemail")
+class VoipLookupNetworkType : LookupNetworkType("voip")
 
 data class CreateContactResponse(val `return`: String, val id: String)
-data class DeleteContactParams(val id: Number)
+
+data class DeleteContactParams(val id: Int)
+
 data class DeleteContactResponse(val `return`: String)
-data class EditContactParams(val id: Number, val email: String?, val empfaenger: String?, val nick: String?)
+
+data class EditContactParams(val id: Int, val email: String?, val empfaenger: String?, val nick: String?)
+
 data class EditContactResponse(val `return`: String)
-data class GetAnalyticsParams(
+
+data class AnalyticsParams(
     val start: String?,
     val end: String?,
     val label: String?,
@@ -652,22 +600,20 @@ data class GetAnalyticsParams(
 
 data class Hook(
     val created: String,
-    val event_type: HookEventType,
+    val event_type: String,
     val id: String,
-    val request_method: HookRequestMethod,
+    val request_method: String,
     val target_url: String,
 )
 
-enum class HookEventType(val value: String) {
-    SmsInbound("sms_mo"),
-    SmsStatus("dlr"),
-    VoiceStatus("voice_status")
-}
+abstract class HookEventType(val value: String)
+class HookEventTypeSmsInbound : HookEventType("sms_mo")
+class HookEventTypeSmsStatus : HookEventType("dlr")
+class HookEventTypeVoiceStatus : HookEventType("voice_status")
 
-enum class HookRequestMethod(val value: String) {
-    Get("GET"),
-    Post("POST"),
-}
+abstract class HookRequestMethod(val value: String)
+class HookRequestMethodGet : HookRequestMethod("GET")
+class HookRequestMethodPost : HookRequestMethod("POST")
 
 object HooksAction {
     const val Read = "read"
@@ -691,12 +637,12 @@ object JournalType {
     const val Replies = "replies"
 }
 
-data class GetJournalParams(
+data class JournalParams(
     val date_from: String?,
     val date_to: String?,
     val id: Int?,
     val state: String?,
-    val to: String?
+    val to: String?,
 )
 
 data class JournalOutbound(
@@ -713,7 +659,7 @@ data class JournalOutbound(
     val label: String?,
     val latency: String?,
     val mccmnc: String?,
-    val type: String?
+    val type: String?,
 ) : JournalBase
 
 data class JournalVoice(
@@ -751,7 +697,7 @@ data class PricingCountry(
     val countryCode: String,
     val countryName: String,
     val countryPrefix: String,
-    val networks: List<PricingCountryNetwork>
+    val networks: List<PricingCountryNetwork>,
 )
 
 data class PricingCountryNetwork(
@@ -760,7 +706,7 @@ data class PricingCountryNetwork(
     val mcc: String,
     val mncs: List<String>,
     val networkName: String,
-    val price: Float
+    val price: Float,
 )
 
 data class PricingParams(val country: String?)
@@ -768,7 +714,7 @@ data class PricingParams(val country: String?)
 data class PricingResponse(
     val countCountries: Int,
     val countNetworks: Int,
-    val countries: List<PricingCountry>
+    val countries: List<PricingCountry>,
 )
 
 object PricingFormat {
@@ -776,59 +722,27 @@ object PricingFormat {
     const val Json = "json"
 }
 
-interface SmsBaseParams {
-    val debug: Boolean?
-    val delay: String?
-    val flash: Boolean?
-    val foreign_id: String?
-    val from: String?
-    val label: String?
-    val no_reload: Boolean?
-    val text: String
-    val to: String
-    val unicode: Boolean?
-    val udh: String?
-    val utf8: Boolean?
-    val ttl: Int?
-    val performance_tracking: Boolean?
+abstract class SmsBaseParams constructor(open var text: String, open var to: String) {
+    var debug: Boolean? = null
+    var delay: String? = null
+    var flash: Boolean? = null
+    var foreign_id: String? = null
+    var from: String? = null
+    var label: String? = null
+    var no_reload: Boolean? = null
+    var unicode: Boolean? = null
+    var udh: String? = null
+    var utf8: Boolean? = null
+    var ttl: Int? = null
+    var performance_tracking: Boolean? = null
 }
 
-data class SmsParams(
-    override val debug: Boolean?,
-    override val delay: String?,
-    override val flash: Boolean?,
-    override val foreign_id: String?,
-    override val from: String?,
-    override val label: String?,
-    override val no_reload: Boolean?,
-    override val text: String,
-    override val to: String,
-    override val unicode: Boolean?,
-    override val udh: String?,
-    override val utf8: Boolean?,
-    override val ttl: Int?,
-    override val performance_tracking: Boolean?,
-    val details: Boolean?,
-    val return_msg_id: Boolean?
+data class SmsParams(override var text: String, override var to: String) : SmsBaseParams(text, to) {
+    public var details: Boolean? = null
+    public var return_msg_id: Boolean? = null
+}
 
-) : SmsBaseParams
-
-data class SmsJsonParams(
-    override val debug: Boolean?,
-    override val delay: String?,
-    override val flash: Boolean?,
-    override val foreign_id: String?,
-    override val from: String?,
-    override val label: String?,
-    override val no_reload: Boolean?,
-    override val text: String,
-    override val to: String,
-    override val unicode: Boolean?,
-    override val udh: String?,
-    override val utf8: Boolean?,
-    override val ttl: Int?,
-    override val performance_tracking: Boolean?,
-) : SmsBaseParams
+data class SmsJsonParams(override var text: String, override var to: String) : SmsBaseParams(text, to)
 
 enum class SmsEncoding {
     gsm,
@@ -846,7 +760,7 @@ data class SmsMessage(
     val recipient: String,
     val sender: String,
     val success: Boolean,
-    val text: String
+    val text: String,
 )
 
 data class SmsResponse(
@@ -855,7 +769,7 @@ data class SmsResponse(
     val messages: List<SmsMessage>,
     val sms_type: SmsType,
     val success: String,
-    val total_price: Float
+    val total_price: Float,
 )
 
 enum class SmsType {
@@ -879,9 +793,12 @@ class SubscribeHookParams(
     val request_method: String? = request_method?.value
 }
 
-data class SubscribeHookResponse(val success: Boolean, val id: Number?)
-data class UnsubscribeHookParams(val id: Number)
+data class SubscribeHookResponse(val success: Boolean, val id: Int?)
+
+data class UnsubscribeHookParams(val id: Int)
+
 data class UnsubscribeHookResponse(val success: Boolean)
+
 data class ValidateForVoiceParams(
     val number: String,
     val callback: String?,
@@ -894,12 +811,12 @@ data class ValidateForVoiceResponse(
     val id: Int?,
     val sender: String?,
     val success: Boolean,
-    val voice: Boolean?
+    val voice: Boolean?,
 )
 
 data class VoiceParams(
     val from: String?,
     val text: String,
     val to: String,
-    val xml: Boolean?
+    val xml: Boolean?,
 )
