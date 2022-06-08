@@ -643,6 +643,7 @@ data class JournalParams(
     val id: Int?,
     val state: String?,
     val to: String?,
+    val limit: Int?,
 )
 
 data class JournalOutbound(
