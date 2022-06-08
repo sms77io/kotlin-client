@@ -820,4 +820,6 @@ data class VoiceParams(
     val text: String,
     val to: String,
     val xml: Boolean?,
+    val debug: Boolean?,
+    val json: Boolean?,
 )

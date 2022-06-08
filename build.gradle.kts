@@ -66,4 +66,4 @@ repositories {
 sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("testresources")
 
-version = "0.0.1"
+version = "0.0.2"
