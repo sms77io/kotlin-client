@@ -1,4 +1,4 @@
-package com.sms77
+package com.seven
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -10,7 +10,7 @@ import io.ktor.http.*
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 
-const val BASE_URL = "https://gateway.sms77.io/api/"
+const val BASE_URL = "https://gateway.seven.io/api/"
 
 suspend fun analyticsByCountry(client: HttpClient, params: AnalyticsParams): List<AnalyticByCountry> {
     return client.get {
@@ -379,7 +379,7 @@ private inline fun <reified T> toQueryString(endpoint: String, props: Collection
 }
 
 data class ClientParams(
-    val apiKey: String = System.getenv("SMS77_API_KEY"),
+    val apiKey: String = System.getenv("SEVEN_API_KEY"),
     val debug: Boolean = false,
     val dummy: Boolean = false,
     val sentWith: String = "Kotlin",

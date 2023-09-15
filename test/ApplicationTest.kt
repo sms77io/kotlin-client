@@ -1,4 +1,4 @@
-package com.sms77
+package com.seven
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -9,7 +9,7 @@ class ApplicationTest {
     private var contactId: Int? = null
 
     private val clientParams = ClientParams(
-        apiKey = System.getenv("SMS77_DUMMY_API_KEY"),
+        apiKey = System.getenv("SEVEN_API_KEY_SANDBOX"),
         debug = true,
         dummy = true,
         sentWith = "Kotlin-Test",
@@ -508,7 +508,7 @@ class ApplicationTest {
             val text = voice(client, VoiceParams(
                 from = "Kotlin-Test",
                 text = "Hi my friend",
-                to = "491771783130",
+                to = "4917987654321",
                 xml = false
             ))
 
@@ -518,7 +518,7 @@ class ApplicationTest {
 
     private fun editContactParams(): EditContactParams {
         return EditContactParams(
-            email = "test@sms77.io",
+            email = "test@seven.io",
             empfaenger = "${System.currentTimeMillis()}",
             id = contactId!!,
             nick = "Tommy Testing"

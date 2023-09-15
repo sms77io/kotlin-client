@@ -3,7 +3,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 
 application {
-    mainClassName = "com.sms77.ApplicationKt"
+    mainClassName = "com.seven.ApplicationKt"
 }
 
 dependencies {
@@ -25,7 +25,7 @@ dependencies {
     testImplementation(kotlin("test-testng"))
 }
 
-group = "com.sms77"
+group = "com.seven"
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
 kotlin.sourceSets["test"].kotlin.srcDirs("test")
@@ -39,8 +39,8 @@ plugins {
 
 publishing {
 /*    publications {
-        create<MavenPublication>("Sms77Client") {
-            artifactId = "sms77-client"
+        create<MavenPublication>("SevenClient") {
+            artifactId = "seven-client"
             from(components["java"])
             groupId = "$group"
             version = version
@@ -49,7 +49,7 @@ publishing {
 
     repositories {
         mavenLocal() {
-            name = "Sms77Client"
+            name = "SevenClient"
             url = uri("file://${buildDir}/repo")
         }
        // maven {}
