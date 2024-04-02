@@ -11,9 +11,9 @@ class NumbersResource(client: HttpClient) : Resource(client) {
         }
     }
 
-    suspend fun delete(id: Int, deleteImmediately: Boolean = false): Void {
+    suspend fun delete(phoneNumber: String, deleteImmediately: Boolean = false): DeleteResponse {
         return client.delete {
-            url("${BASE_URL}numbers/active/${id}?deleteImmediately=${deleteImmediately}")
+            url("${BASE_URL}numbers/active/${phoneNumber}?deleteImmediately=${deleteImmediately}")
         }
     }
 
@@ -54,6 +54,11 @@ data class OrderResponse(
     val success: Boolean,
 )
 
+data class DeleteResponse(
+    val message: String?,
+    val success: Boolean,
+)
+
 data class OrderParams(
     val number: String,
     val payment_interval: PaymentInterval = PaymentInterval.annnually,
@@ -70,8 +75,9 @@ data class Number(
     val country: String,
     val created: String? = null,
     val features: Features,
+    var friendly_name: String,
     val fees: Fees,
-    var number: String,
+    val number: String,
     val number_parsed: String,
 )
 
