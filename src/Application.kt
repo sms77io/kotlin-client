@@ -204,63 +204,65 @@ suspend fun unsubscribeHook(client: HttpClient, params: UnsubscribeHookParams): 
     }
 }
 
-suspend fun lookupCnam(client: HttpClient, params: LookupParams): LookupCnamResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "lookup?type=${LookupType.CallerNameDelivery}",
-                LookupParams::class.memberProperties,
-                params
+class LookupResource(client: HttpClient) : Resource(client) {
+    suspend fun cnam(params: LookupParams): LookupCnamResponse {
+        return client.get {
+            url(
+                toQueryString(
+                    "lookup?type=${LookupType.CallerNameDelivery}",
+                    LookupParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun lookupFormat(client: HttpClient, params: LookupParams): LookupFormatResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "lookup?type=${LookupType.Format}",
-                LookupParams::class.memberProperties,
-                params
+    suspend fun format(params: LookupParams): LookupFormatResponse {
+        return client.get {
+            url(
+                toQueryString(
+                    "lookup?type=${LookupType.Format}",
+                    LookupParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun lookupHlr(client: HttpClient, params: LookupParams): LookupHlrResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "lookup?type=${LookupType.HomeLocationRegister}",
-                LookupParams::class.memberProperties,
-                params
+    suspend fun hlr(params: LookupParams): LookupHlrResponse {
+        return client.get {
+            url(
+                toQueryString(
+                    "lookup?type=${LookupType.HomeLocationRegister}",
+                    LookupParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun lookupMnp(client: HttpClient, params: LookupParams): String {
-    return client.get {
-        url(
-            toQueryString(
-                "lookup?type=${LookupType.MobileNumberPortability}",
-                LookupParams::class.memberProperties,
-                params
+    suspend fun mnp(params: LookupParams): String {
+        return client.get {
+            url(
+                toQueryString(
+                    "lookup?type=${LookupType.MobileNumberPortability}",
+                    LookupParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun lookupMnpJson(client: HttpClient, params: LookupParams): LookupMnpResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "lookup?type=${LookupType.MobileNumberPortability}&json=1",
-                LookupParams::class.memberProperties,
-                params
+    suspend fun mnpJSON(params: LookupParams): LookupMnpResponse {
+        return client.get {
+            url(
+                toQueryString(
+                    "lookup?type=${LookupType.MobileNumberPortability}&json=1",
+                    LookupParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
 }
 

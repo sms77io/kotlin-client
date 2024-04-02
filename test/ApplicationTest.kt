@@ -19,6 +19,7 @@ class ApplicationTest {
     private val client = getClient(clientParams)
     private val analytics =  AnalyticsResource(client);
     private val journal =  JournalResource(client);
+    private val lookup =  LookupResource(client);
 
     @Test
     fun testBalance() {
@@ -261,7 +262,7 @@ class ApplicationTest {
     @Test
     fun testLookupCnam() {
         runBlocking {
-            val lookup = lookupCnam(client, LookupParams("491771783130"))
+            val lookup = lookup.cnam(LookupParams("491771783130"))
 
             assertFalse(lookup.code.isBlank())
             assertFalse(lookup.name.isBlank())
@@ -273,7 +274,7 @@ class ApplicationTest {
     @Test
     fun testLookupFormat() {
         runBlocking {
-            val lookup = lookupFormat(client, LookupParams("491771783130"))
+            val lookup = lookup.format(LookupParams("491771783130"))
 
             assertFalse(lookup.carrier.isBlank())
             assertFalse(lookup.country_code.isBlank())
@@ -295,7 +296,7 @@ class ApplicationTest {
                 assertEquals(MobileLookupNetworkType().value, c.network_type)
             }
 
-            val lookup = lookupHlr(client, LookupParams("491771783130"))
+            val lookup = lookup.hlr(LookupParams("491771783130"))
 
             assertEquals("DE", lookup.country_code)
             assertNull(lookup.country_code_iso3)
@@ -322,14 +323,14 @@ class ApplicationTest {
     @Test
     fun testLookupMnp() {
         runBlocking {
-            assertEquals("eplus", lookupMnp(client, LookupParams("491771783130")))
+            assertEquals("eplus", lookup.mnp(LookupParams("491771783130")))
         }
     }
 
     @Test
     fun testLookupMnpJson() {
         runBlocking {
-            val lookup = lookupMnpJson(client, LookupParams("491771783130"))
+            val lookup = lookup.mnpJSON(LookupParams("491771783130"))
 
             assertEquals(100, lookup.code)
             assertTrue(lookup.mnp.country.isBlank())
