@@ -26,7 +26,8 @@ class ApplicationTest {
     @Test
     fun testBalance() {
         runBlocking {
-            assertTrue(0 <= balance(client))
+            val res = balance(client)
+            assertTrue(0 <= res.amount)
         }
     }
 

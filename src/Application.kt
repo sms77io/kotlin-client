@@ -114,10 +114,10 @@ class JournalResource(client: HttpClient) : Resource(client) {
     }
 }
 
-suspend fun balance(client: HttpClient): Float {
-    return client.get<String> {
+suspend fun balance(client: HttpClient): Balance {
+    return client.get<Balance> {
         url("${BASE_URL}balance")
-    }.toFloat()
+    }
 }
 
 class ContactsResource(client: HttpClient) : Resource(client) {
@@ -358,8 +358,9 @@ fun getClient(params: ClientParams): HttpClient {
 
         defaultRequest {
             developmentMode = params.debug
+            header("Accept", "application/json")
             header("sentWith", params.sentWith)
-            header("Authorization", "Basic ${params.apiKey}")
+            header("Authorization", "Basic ${params.apiKey}") // TODO
         }
     }
 }
@@ -839,4 +840,9 @@ data class VoiceResponse(
     val messages: List<VoiceMessage>,
     val success: String,
     val total_price: Float,
+)
+
+data class Balance(
+    val amount: Float,
+    val currency: String,
 )
