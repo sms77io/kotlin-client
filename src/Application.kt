@@ -241,19 +241,7 @@ class LookupResource(client: HttpClient) : Resource(client) {
         }
     }
 
-    suspend fun mnp(params: LookupParams): String {
-        return client.get {
-            url(
-                toQueryString(
-                    "lookup?type=${LookupType.MobileNumberPortability}",
-                    LookupParams::class.memberProperties,
-                    params
-                )
-            )
-        }
-    }
-
-    suspend fun mnpJSON(params: LookupParams): LookupMnpResponse {
+    suspend fun mnp(params: LookupParams): LookupMnpResponse {
         return client.get {
             url(
                 toQueryString(

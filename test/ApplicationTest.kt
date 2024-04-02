@@ -323,14 +323,7 @@ class ApplicationTest {
     @Test
     fun testLookupMnp() {
         runBlocking {
-            assertEquals("eplus", lookup.mnp(LookupParams("491771783130")))
-        }
-    }
-
-    @Test
-    fun testLookupMnpJson() {
-        runBlocking {
-            val lookup = lookup.mnpJSON(LookupParams("491771783130"))
+            val lookup = lookup.mnp(LookupParams("491771783130"))
 
             assertEquals(100, lookup.code)
             assertTrue(lookup.mnp.country.isBlank())
