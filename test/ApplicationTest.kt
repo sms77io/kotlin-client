@@ -3,19 +3,9 @@ package com.seven
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
-class ApplicationTest {
+class ApplicationTest : BaseTest() {
     private var hookId: Int? = 92
     private var contactId: Int? = null
-
-    private val clientParams = ClientParams(
-        apiKey = System.getenv("SEVEN_API_KEY_SANDBOX"),
-        debug = true,
-        dummy = true,
-        sentWith = "Kotlin-Test",
-        testing = true,
-    )
-
-    private val client = getClient(clientParams)
     private val analytics = AnalyticsResource(client)
     private val hooks = HooksResource(client)
     private val journal = JournalResource(client)
@@ -405,15 +395,6 @@ class ApplicationTest {
             assertEquals(params.text, msg.text)
             assertEquals(params.to, msg.recipient)
         }
-    }
-
-    private fun editContactParams(): EditContactParams {
-        return EditContactParams(
-            email = "test@seven.io",
-            empfaenger = "${System.currentTimeMillis()}",
-            id = contactId!!,
-            nick = "Tommy Testing"
-        )
     }
 
     private fun <T> testAnalyticsBase(analytics: List<T>, each: (analytic: T) -> Unit) where T : AnalyticBase {
