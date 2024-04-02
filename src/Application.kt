@@ -182,27 +182,29 @@ class ContactsResource(client: HttpClient) : Resource(client) {
     }
 }
 
-suspend fun getHooks(client: HttpClient): GetHooksResponse {
-    return client.get {
-        url("${BASE_URL}hooks?action=${HooksAction.Read}")
+class HooksResource(client: HttpClient) : Resource(client) {
+    suspend fun get(): GetHooksResponse {
+        return client.get {
+            url("${BASE_URL}hooks?action=${HooksAction.Read}")
+        }
     }
-}
 
-suspend fun subscribeHook(client: HttpClient, params: SubscribeHookParams): SubscribeHookResponse {
-    return client.post {
-        url(
-            toQueryString(
-                "hooks?action=${HooksAction.Subscribe}",
-                SubscribeHookParams::class.memberProperties,
-                params
+    suspend fun subscribe(params: SubscribeHookParams): SubscribeHookResponse {
+        return client.post {
+            url(
+                toQueryString(
+                    "hooks?action=${HooksAction.Subscribe}",
+                    SubscribeHookParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun unsubscribeHook(client: HttpClient, params: UnsubscribeHookParams): UnsubscribeHookResponse {
-    return client.post {
-        url("${BASE_URL}hooks?action=${HooksAction.Unsubscribe}&id=${params.id}")
+    suspend fun unsubscribe(params: UnsubscribeHookParams): UnsubscribeHookResponse {
+        return client.post {
+            url("${BASE_URL}hooks?action=${HooksAction.Unsubscribe}&id=${params.id}")
+        }
     }
 }
 

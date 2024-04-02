@@ -17,10 +17,11 @@ class ApplicationTest {
     )
 
     private val client = getClient(clientParams)
-    private val contacts =  ContactsResource(client);
-    private val analytics =  AnalyticsResource(client);
-    private val journal =  JournalResource(client);
-    private val lookup =  LookupResource(client);
+    private val contacts = ContactsResource(client)
+    private val analytics = AnalyticsResource(client)
+    private val hooks = HooksResource(client)
+    private val journal = JournalResource(client)
+    private val lookup = LookupResource(client)
 
     @Test
     fun testBalance() {
@@ -184,7 +185,7 @@ class ApplicationTest {
     @Test
     fun testGetHooks() {
         runBlocking {
-            val hooks = getHooks(client)
+            val hooks = hooks.get()
 
             assertTrue(hooks.success)
 
@@ -427,7 +428,7 @@ class ApplicationTest {
     @Test
     fun testSubscribeHook() {
         runBlocking {
-            val o = subscribeHook(client, SubscribeHookParams(
+            val o = hooks.subscribe(SubscribeHookParams(
                 event_type = HookEventTypeSmsInbound(),
                 request_method = HookRequestMethodGet(),
                 target_url = "https://my.tld/kotlin/test/${System.currentTimeMillis()}"
@@ -453,7 +454,7 @@ class ApplicationTest {
         }
 
         runBlocking {
-            val o = unsubscribeHook(client, UnsubscribeHookParams(id = hookId!!))
+            val o = hooks.unsubscribe(UnsubscribeHookParams(id = hookId!!))
 
             if (o.success) {
                 hookId = null
