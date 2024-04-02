@@ -270,27 +270,29 @@ suspend fun pricing(client: HttpClient, params: PricingParams): PricingResponse 
     }
 }
 
-suspend fun sms(client: HttpClient, params: SmsParams): SmsResponse {
-    return client.post {
-        url(
-            toQueryString(
-                "sms?json=1",
-                SmsParams::class.memberProperties,
-                params
+class SmsResource(client: HttpClient) : Resource(client) {
+    suspend fun dispatch(params: SmsParams): SmsResponse {
+        return client.post {
+            url(
+                toQueryString(
+                    "sms?json=1",
+                    SmsParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun status(client: HttpClient, params: StatusParams): String {
-    return client.get {
-        url(
-            toQueryString(
-                "status?",
-                StatusParams::class.memberProperties,
-                params
+    suspend fun status(params: StatusParams): String {
+        return client.get {
+            url(
+                toQueryString(
+                    "status?",
+                    StatusParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
 }
 

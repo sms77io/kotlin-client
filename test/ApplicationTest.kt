@@ -21,6 +21,7 @@ class ApplicationTest {
     private val hooks = HooksResource(client)
     private val journal = JournalResource(client)
     private val lookup = LookupResource(client)
+    private val sms = SmsResource(client)
 
     @Test
     fun testBalance() {
@@ -369,7 +370,7 @@ class ApplicationTest {
         runBlocking {
             val params = SmsParams(to = "491771783130", text = "HI2U!")
             params.from = "Kotlin-Test"
-            val o = sms(client, params)
+            val o = sms.dispatch(params)
 
             assertEquals("100", o.success)
             assertEquals(0.toFloat(), o.total_price) // assertTrue(0 < o.total_price)
@@ -403,9 +404,9 @@ class ApplicationTest {
     }
 
     @Test
-    fun testStatus() {
+    fun testSmsStatus() {
         runBlocking {
-            val text = status(client, StatusParams("77133879512"))
+            val text = sms.status(StatusParams("77133879512"))
 
             assertFalse(text.isBlank())
         }
