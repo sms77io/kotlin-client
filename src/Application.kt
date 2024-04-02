@@ -334,7 +334,7 @@ suspend fun validateForVoice(client: HttpClient, params: ValidateForVoiceParams)
     }
 }
 
-suspend fun voice(client: HttpClient, params: VoiceParams): String {
+suspend fun voice(client: HttpClient, params: VoiceParams): VoiceResponse {
     return client.post {
         url(
             toQueryString(
@@ -823,5 +823,24 @@ data class VoiceParams(
     val text: String,
     val to: String,
     val xml: Boolean?,
-    val json: Boolean?,
+)
+
+data class VoiceMessage(
+    val error: String?,
+    val error_text: String?,
+    val id: String?,
+    val messages: List<String>?,
+    val price: Float,
+    val recipient: String,
+    val sender: String,
+    val success: Boolean,
+    val text: String,
+)
+
+data class VoiceResponse(
+    val balance: Float,
+    val debug: Boolean,
+    val messages: List<VoiceMessage>,
+    val success: String,
+    val total_price: Float,
 )

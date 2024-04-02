@@ -507,14 +507,17 @@ class ApplicationTest {
     @Test
     fun testVoice() {
         runBlocking {
-            val text = voice(client, VoiceParams(
+            val params = VoiceParams(
                 from = "Kotlin-Test",
                 text = "Hi my friend",
                 to = "4917987654321",
                 xml = false
-            ))
+            )
+            val response = voice(client, params)
+            val msg = response.messages.first()
 
-            assertFalse(text.isBlank())
+            assertEquals(params.text, msg.text)
+            assertEquals(params.to, msg.recipient)
         }
     }
 
