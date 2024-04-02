@@ -13,7 +13,6 @@ const val BASE_URL = "https://gateway.seven.io/api/"
 
 abstract class Resource(protected val client: HttpClient)
 
-
 fun getClient(params: ClientParams): HttpClient {
     return HttpClient(CIO) {
         install(JsonFeature) {
