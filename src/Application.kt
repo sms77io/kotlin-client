@@ -270,18 +270,6 @@ suspend fun pricing(client: HttpClient, params: PricingParams): PricingResponse 
     }
 }
 
-suspend fun pricingCsv(client: HttpClient, params: PricingParams): String {
-    return client.get {
-        url(
-            toQueryString(
-                "pricing?format=${PricingFormat.Csv}",
-                PricingParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
 suspend fun sms(client: HttpClient, params: SmsParams): String {
     return client.post {
         url(
@@ -718,11 +706,6 @@ data class PricingResponse(
     val countNetworks: Int,
     val countries: List<PricingCountry>,
 )
-
-object PricingFormat {
-    const val Csv = "csv"
-    const val Json = "json"
-}
 
 abstract class SmsBaseParams constructor(open var text: String, open var to: String) {
     var delay: String? = null

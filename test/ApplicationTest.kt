@@ -366,14 +366,6 @@ class ApplicationTest {
     }
 
     @Test
-    fun testPricingCsv() {
-        runBlocking {
-            val csv = pricingCsv(client, PricingParams(country = null))
-            assertFalse(csv.isBlank())
-        }
-    }
-
-    @Test
     fun testSms() {
         runBlocking {
             assertEquals("100", sms(client, SmsParams(to = "491771783130", text = "HI2U!")))
