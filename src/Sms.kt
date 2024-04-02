@@ -74,7 +74,6 @@ data class SmsResponse(
 
 enum class SmsType {
     direct,
-    economy
 }
 
 data class StatusParams(val msg_id: String)
