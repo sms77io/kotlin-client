@@ -18,6 +18,8 @@ class ApplicationTest {
 
     private val client = getClient(clientParams)
 
+    private val analytics =  AnalyticsResource(client);
+
     @Test
     fun testBalance() {
         runBlocking {
@@ -33,7 +35,7 @@ class ApplicationTest {
             }
 
             testAnalyticsBase(
-                analyticsByCountry(client, AnalyticsParams(null, null, null, null)),
+                analytics.byCountry(AnalyticsParams(null, null, null, null)),
                 ::each
             )
         }
@@ -47,7 +49,7 @@ class ApplicationTest {
             }
 
             testAnalyticsBase(
-                analyticsByDate(client, AnalyticsParams(null, null, null, null)),
+                analytics.byDate(AnalyticsParams(null, null, null, null)),
                 ::each
             )
         }
@@ -61,7 +63,7 @@ class ApplicationTest {
             }
 
             testAnalyticsBase(
-                analyticsByLabel(client, AnalyticsParams(null, null, null, null)),
+                analytics.byLabel(AnalyticsParams(null, null, null, null)),
                 ::each
             )
         }
@@ -75,7 +77,7 @@ class ApplicationTest {
             }
 
             testAnalyticsBase(
-                analyticsBySubaccount(client, AnalyticsParams(null, null, null, null)),
+                analytics.bySubaccount(AnalyticsParams(null, null, null, null)),
                 ::each
             )
         }

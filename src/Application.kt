@@ -12,51 +12,55 @@ import kotlin.reflect.full.memberProperties
 
 const val BASE_URL = "https://gateway.seven.io/api/"
 
-suspend fun analyticsByCountry(client: HttpClient, params: AnalyticsParams): List<AnalyticByCountry> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Country}",
-                AnalyticsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
+abstract class Resource(protected val client: HttpClient)
 
-suspend fun analyticsByDate(client: HttpClient, params: AnalyticsParams): List<AnalyticByDate> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Date}",
-                AnalyticsParams::class.memberProperties,
-                params
+class AnalyticsResource(client: HttpClient) : Resource(client) {
+    suspend fun byCountry(params: AnalyticsParams): List<AnalyticByCountry> {
+        return client.get {
+            url(
+                toQueryString(
+                    "analytics?group_by=${AnalyticsGroupBy.Country}",
+                    AnalyticsParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun analyticsByLabel(client: HttpClient, params: AnalyticsParams): List<AnalyticByLabel> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Label}",
-                AnalyticsParams::class.memberProperties,
-                params
+    suspend fun byDate(params: AnalyticsParams): List<AnalyticByDate> {
+        return client.get {
+            url(
+                toQueryString(
+                    "analytics?group_by=${AnalyticsGroupBy.Date}",
+                    AnalyticsParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun analyticsBySubaccount(client: HttpClient, params: AnalyticsParams): List<AnalyticBySubaccount> {
-    return client.get {
-        url(
-            toQueryString(
-                "analytics?group_by=${AnalyticsGroupBy.Subaccount}",
-                AnalyticsParams::class.memberProperties,
-                params
+    suspend fun byLabel(params: AnalyticsParams): List<AnalyticByLabel> {
+        return client.get {
+            url(
+                toQueryString(
+                    "analytics?group_by=${AnalyticsGroupBy.Label}",
+                    AnalyticsParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
+    }
+
+    suspend fun bySubaccount(params: AnalyticsParams): List<AnalyticBySubaccount> {
+        return client.get {
+            url(
+                toQueryString(
+                    "analytics?group_by=${AnalyticsGroupBy.Subaccount}",
+                    AnalyticsParams::class.memberProperties,
+                    params
+                )
+            )
+        }
     }
 }
 
