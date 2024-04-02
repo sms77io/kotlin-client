@@ -17,8 +17,8 @@ class ApplicationTest {
     )
 
     private val client = getClient(clientParams)
-
     private val analytics =  AnalyticsResource(client);
+    private val journal =  JournalResource(client);
 
     @Test
     fun testBalance() {
@@ -202,7 +202,7 @@ class ApplicationTest {
             fun each(j: JournalInbound) {}
 
             testJournalBase(
-                journalInbound(client, JournalParams(null, null, null, null, null)),
+                journal.inbound(JournalParams(null, null, null, null, null, null)),
                 ::each
             )
         }
@@ -223,7 +223,7 @@ class ApplicationTest {
             }
 
             testJournalBase(
-                journalOutbound(client, JournalParams(null, null, null, null, null)),
+                journal.outbound(JournalParams(null, null, null, null, null, null)),
                 ::each
             )
         }
@@ -235,7 +235,7 @@ class ApplicationTest {
             fun each(j: JournalReplies) {}
 
             testJournalBase(
-                journalReplies(client, JournalParams(null, null, null, null, null)),
+                journal.replies(JournalParams(null, null, null, null, null, null)),
                 ::each
             )
         }
@@ -252,7 +252,7 @@ class ApplicationTest {
             }
 
             testJournalBase(
-                journalVoice(client, JournalParams(null, null, null, null, null)),
+                journal.voice(JournalParams(null, null, null, null, null, null)),
                 ::each
             )
         }

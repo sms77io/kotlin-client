@@ -64,6 +64,56 @@ class AnalyticsResource(client: HttpClient) : Resource(client) {
     }
 }
 
+class JournalResource(client: HttpClient) : Resource(client) {
+    suspend fun inbound(params: JournalParams): List<JournalInbound> {
+        return client.get {
+            url(
+                toQueryString(
+                    "journal?type=${JournalType.Inbound}",
+                    JournalParams::class.memberProperties,
+                    params
+                )
+            )
+        }
+    }
+
+    suspend fun outbound(params: JournalParams): List<JournalOutbound> {
+        return client.get {
+            url(
+                toQueryString(
+                    "journal?type=${JournalType.Outbound}",
+                    JournalParams::class.memberProperties,
+                    params
+                )
+            )
+        }
+    }
+
+    suspend fun replies(params: JournalParams): List<JournalReplies> {
+        return client.get {
+            url(
+                toQueryString(
+                    "journal?type=${JournalType.Replies}",
+                    JournalParams::class.memberProperties,
+                    params
+                )
+            )
+        }
+    }
+
+    suspend fun voice(params: JournalParams): List<JournalVoice> {
+        return client.get {
+            url(
+                toQueryString(
+                    "journal?type=${JournalType.Voice}",
+                    JournalParams::class.memberProperties,
+                    params
+                )
+            )
+        }
+    }
+}
+
 suspend fun balance(client: HttpClient): Float {
     return client.get<String> {
         url("${BASE_URL}balance")
@@ -133,54 +183,6 @@ suspend fun getContactsJson(client: HttpClient): List<Contact> {
 suspend fun getHooks(client: HttpClient): GetHooksResponse {
     return client.get {
         url("${BASE_URL}hooks?action=${HooksAction.Read}")
-    }
-}
-
-suspend fun journalInbound(client: HttpClient, params: JournalParams): List<JournalInbound> {
-    return client.get {
-        url(
-            toQueryString(
-                "journal?type=${JournalType.Inbound}",
-                JournalParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun journalOutbound(client: HttpClient, params: JournalParams): List<JournalOutbound> {
-    return client.get {
-        url(
-            toQueryString(
-                "journal?type=${JournalType.Outbound}",
-                JournalParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun journalReplies(client: HttpClient, params: JournalParams): List<JournalReplies> {
-    return client.get {
-        url(
-            toQueryString(
-                "journal?type=${JournalType.Replies}",
-                JournalParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun journalVoice(client: HttpClient, params: JournalParams): List<JournalVoice> {
-    return client.get {
-        url(
-            toQueryString(
-                "journal?type=${JournalType.Voice}",
-                JournalParams::class.memberProperties,
-                params
-            )
-        )
     }
 }
 
