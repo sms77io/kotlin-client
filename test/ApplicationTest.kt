@@ -17,6 +17,7 @@ class ApplicationTest {
     )
 
     private val client = getClient(clientParams)
+    private val contacts =  ContactsResource(client);
     private val analytics =  AnalyticsResource(client);
     private val journal =  JournalResource(client);
     private val lookup =  LookupResource(client);
@@ -88,7 +89,7 @@ class ApplicationTest {
     fun testContactCreateEditDelete() {
         fun create() {
             runBlocking {
-                val lines = createContact(client).lines()
+                val lines = contacts.create().lines()
                 assertEquals(2, lines.size)
                 val code = lines[0]
                 val id = lines[1].toInt()
@@ -104,7 +105,7 @@ class ApplicationTest {
             }
 
             runBlocking {
-                assertEquals("152", editContact(client, editContactParams()))
+                assertEquals("152", contacts.edit(editContactParams()))
             }
         }
 
@@ -114,7 +115,7 @@ class ApplicationTest {
             }
 
             runBlocking {
-                assertEquals("152", deleteContact(client, DeleteContactParams(id = contactId!!)))
+                assertEquals("152", contacts.delete(DeleteContactParams(id = contactId!!)))
                 contactId = null
             }
         }
@@ -128,7 +129,7 @@ class ApplicationTest {
     fun testContactCreateEditDeleteJson() {
         fun create() {
             runBlocking {
-                val o = createContactJson(client)
+                val o = contacts.createJson()
                 assertEquals("152", o.`return`)
                 val id = o.id.toInt()
                 assertTrue(0 < id)
@@ -142,7 +143,7 @@ class ApplicationTest {
             }
 
             runBlocking {
-                assertEquals("152", editContactJson(client, editContactParams()).`return`)
+                assertEquals("152", contacts.editJson(editContactParams()).`return`)
             }
         }
 
@@ -152,7 +153,7 @@ class ApplicationTest {
             }
 
             runBlocking {
-                assertEquals("152", deleteContactJson(client, DeleteContactParams(id = contactId!!)).`return`)
+                assertEquals("152", contacts.deleteJson(DeleteContactParams(id = contactId!!)).`return`)
                 contactId = null
             }
         }
@@ -165,14 +166,14 @@ class ApplicationTest {
     @Test
     fun testGetContacts() {
         runBlocking {
-            assertFalse(getContacts(client).isBlank())
+            assertFalse(contacts.get().isBlank())
         }
     }
 
     @Test
     fun testGetContactsJson() {
         runBlocking {
-            for (contact in getContactsJson(client)) {
+            for (contact in contacts.getJson()) {
                 assertFalse(contact.ID.isBlank())
                 assertNotNull(contact.Name)
                 assertNotNull(contact.Number)

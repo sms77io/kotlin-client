@@ -120,63 +120,65 @@ suspend fun balance(client: HttpClient): Float {
     }.toFloat()
 }
 
-suspend fun createContact(client: HttpClient): String {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Write}")
+class ContactsResource(client: HttpClient) : Resource(client) {
+    suspend fun create(): String {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Write}")
+        }
     }
-}
 
-suspend fun createContactJson(client: HttpClient): CreateContactResponse {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Write}&json=1")
+    suspend fun createJson(): CreateContactResponse {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Write}&json=1")
+        }
     }
-}
 
-suspend fun editContact(client: HttpClient, params: EditContactParams): String {
-    return client.get {
-        url(
-            toQueryString(
-                "contacts?action=${ContactsAction.Write}",
-                EditContactParams::class.memberProperties,
-                params
+    suspend fun edit(params: EditContactParams): String {
+        return client.get {
+            url(
+                toQueryString(
+                    "contacts?action=${ContactsAction.Write}",
+                    EditContactParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun editContactJson(client: HttpClient, params: EditContactParams): EditContactResponse {
-    return client.get {
-        url(
-            toQueryString(
-                "contacts?action=${ContactsAction.Write}&json=1",
-                EditContactParams::class.memberProperties,
-                params
+    suspend fun editJson(params: EditContactParams): EditContactResponse {
+        return client.get {
+            url(
+                toQueryString(
+                    "contacts?action=${ContactsAction.Write}&json=1",
+                    EditContactParams::class.memberProperties,
+                    params
+                )
             )
-        )
+        }
     }
-}
 
-suspend fun deleteContact(client: HttpClient, params: DeleteContactParams): String {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Delete}&id=${params.id}")
+    suspend fun delete(params: DeleteContactParams): String {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Delete}&id=${params.id}")
+        }
     }
-}
 
-suspend fun deleteContactJson(client: HttpClient, params: DeleteContactParams): DeleteContactResponse {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Delete}&json=1&id=${params.id}")
+    suspend fun deleteJson(params: DeleteContactParams): DeleteContactResponse {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Delete}&json=1&id=${params.id}")
+        }
     }
-}
 
-suspend fun getContacts(client: HttpClient): String {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Read}")
+    suspend fun get(): String {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Read}")
+        }
     }
-}
 
-suspend fun getContactsJson(client: HttpClient): List<Contact> {
-    return client.get {
-        url("${BASE_URL}contacts?action=${ContactsAction.Read}&json=1")
+    suspend fun getJson(): List<Contact> {
+        return client.get {
+            url("${BASE_URL}contacts?action=${ContactsAction.Read}&json=1")
+        }
     }
 }
 
