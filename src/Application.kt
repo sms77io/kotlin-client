@@ -728,7 +728,6 @@ object PricingFormat {
 }
 
 abstract class SmsBaseParams constructor(open var text: String, open var to: String) {
-    var debug: Boolean? = null
     var delay: String? = null
     var flash: Boolean? = null
     var foreign_id: String? = null
@@ -824,6 +823,5 @@ data class VoiceParams(
     val text: String,
     val to: String,
     val xml: Boolean?,
-    val debug: Boolean?,
     val json: Boolean?,
 )
