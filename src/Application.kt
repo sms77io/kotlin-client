@@ -319,7 +319,7 @@ fun getClient(params: ClientParams): HttpClient {
     }
 }
 
-private inline fun <reified T> toQueryString(endpoint: String, props: Collection<KProperty1<T, *>>, params: T): String {
+inline fun <reified T> toQueryString(endpoint: String, props: Collection<KProperty1<T, *>>, params: T): String {
     var url = "${BASE_URL}${endpoint}"
 
     for (prop in props) {
