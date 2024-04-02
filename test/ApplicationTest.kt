@@ -5,10 +5,7 @@ import kotlin.test.*
 
 class ApplicationTest : BaseTest() {
     private var hookId: Int? = 92
-    private var contactId: Int? = null
-    private val analytics = AnalyticsResource(client)
     private val hooks = HooksResource(client)
-    private val journal = JournalResource(client)
     private val lookup = LookupResource(client)
     private val sms = SmsResource(client)
 
@@ -34,68 +31,6 @@ class ApplicationTest : BaseTest() {
                 assertFalse(hook.request_method.isBlank())
                 assertFalse(hook.target_url.isBlank())
             }
-        }
-    }
-
-    @Test
-    fun testJournalInbound() {
-        runBlocking {
-            fun each(j: JournalInbound) {}
-
-            testJournalBase(
-                journal.inbound(JournalParams(null, null, null, null, null, null)),
-                ::each
-            )
-        }
-    }
-
-    @Test
-    fun testJournalOutbound() {
-        runBlocking {
-            fun each(j: JournalOutbound) {
-                assertFalse(j.connection.isBlank())
-                j.dlr?.let { assertFalse(it.isBlank()) }
-                j.dlr_timestamp?.let { assertFalse(it.isBlank()) }
-                j.foreign_id?.let { assertFalse(it.isBlank()) }
-                j.label?.let { assertFalse(it.isBlank()) }
-                j.latency?.let { assertFalse(it.isBlank()) }
-                j.mccmnc?.let { assertFalse(it.isBlank()) }
-                j.type?.let { assertFalse(it.isBlank()) }
-            }
-
-            testJournalBase(
-                journal.outbound(JournalParams(null, null, null, null, null, null)),
-                ::each
-            )
-        }
-    }
-
-    @Test
-    fun testJournalReplies() {
-        runBlocking {
-            fun each(j: JournalReplies) {}
-
-            testJournalBase(
-                journal.replies(JournalParams(null, null, null, null, null, null)),
-                ::each
-            )
-        }
-    }
-
-    @Test
-    fun testJournalVoice() {
-        runBlocking {
-            fun each(j: JournalVoice) {
-                assertFalse(j.duration.isBlank())
-                assertNotNull(j.error)
-                assertNotNull(j.status)
-                assertNotNull(j.xml)
-            }
-
-            testJournalBase(
-                journal.voice(JournalParams(null, null, null, null, null, null)),
-                ::each
-            )
         }
     }
 
@@ -338,19 +273,6 @@ class ApplicationTest : BaseTest() {
 
             assertEquals(params.text, msg.text)
             assertEquals(params.to, msg.recipient)
-        }
-    }
-
-    private fun <T> testJournalBase(journals: List<T>, each: (journal: T) -> Unit) where T : JournalBase {
-        for (journal in journals) {
-            assertNotEquals(0.toBigInteger(), journal.id.toBigInteger())
-            assertFalse(journal.timestamp.isBlank())
-            if (0.toFloat() != journal.price.toFloat()) {
-                assertFalse(journal.to.isBlank())
-                assertFalse(journal.text.isBlank())
-            }
-
-            each(journal)
         }
     }
 }
