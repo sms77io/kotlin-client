@@ -1,6 +1,5 @@
 package com.seven
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
@@ -368,16 +367,9 @@ class ApplicationTest {
     @Test
     fun testSms() {
         runBlocking {
-            assertEquals("100", sms(client, SmsParams(to = "491771783130", text = "HI2U!")))
-        }
-    }
-
-    @Test
-    fun testSmsJson() {
-        runBlocking {
-            val params = SmsJsonParams(to = "491771783130", text = "HI2U!")
+            val params = SmsParams(to = "491771783130", text = "HI2U!")
             params.from = "Kotlin-Test"
-            val o = smsJson(client, params)
+            val o = sms(client, params)
 
             assertEquals("100", o.success)
             assertEquals(0.toFloat(), o.total_price) // assertTrue(0 < o.total_price)
@@ -407,6 +399,7 @@ class ApplicationTest {
                 assertEquals(true, m.success)
             }
         }
+
     }
 
     @Test

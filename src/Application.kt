@@ -270,24 +270,12 @@ suspend fun pricing(client: HttpClient, params: PricingParams): PricingResponse 
     }
 }
 
-suspend fun sms(client: HttpClient, params: SmsParams): String {
-    return client.post {
-        url(
-            toQueryString(
-                "sms?",
-                SmsParams::class.memberProperties,
-                params
-            )
-        )
-    }
-}
-
-suspend fun smsJson(client: HttpClient, params: SmsJsonParams): SmsResponse {
+suspend fun sms(client: HttpClient, params: SmsParams): SmsResponse {
     return client.post {
         url(
             toQueryString(
                 "sms?json=1",
-                SmsJsonParams::class.memberProperties,
+                SmsParams::class.memberProperties,
                 params
             )
         )
@@ -707,7 +695,7 @@ data class PricingResponse(
     val countries: List<PricingCountry>,
 )
 
-abstract class SmsBaseParams constructor(open var text: String, open var to: String) {
+data class SmsParams(var text: String, var to: String)  {
     var delay: String? = null
     var flash: Boolean? = null
     var foreign_id: String? = null
@@ -720,13 +708,6 @@ abstract class SmsBaseParams constructor(open var text: String, open var to: Str
     var ttl: Int? = null
     var performance_tracking: Boolean? = null
 }
-
-data class SmsParams(override var text: String, override var to: String) : SmsBaseParams(text, to) {
-    public var details: Boolean? = null
-    public var return_msg_id: Boolean? = null
-}
-
-data class SmsJsonParams(override var text: String, override var to: String) : SmsBaseParams(text, to)
 
 enum class SmsEncoding {
     gsm,
