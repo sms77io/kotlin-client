@@ -20,7 +20,7 @@ class SmsTest : BaseTest() {
             assertEquals(clientParams.dummy.toString(), o.debug.toString())
 
             for (m in o.messages) {
-                assertEquals(SmsEncoding.gsm, m.encoding)
+                assertEquals(MessageEncoding.gsm, m.encoding)
                 if (null !== m.error) {
                     assertFalse(m.error!!.isBlank())
                 }

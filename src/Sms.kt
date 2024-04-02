@@ -44,13 +44,13 @@ data class SmsParams(var text: String, var to: String)  {
     var performance_tracking: Boolean? = null
 }
 
-enum class SmsEncoding {
+enum class MessageEncoding {
     gsm,
     ucs2
 }
 
 data class SmsMessage(
-    val encoding: SmsEncoding,
+    val encoding: MessageEncoding,
     val error: String?,
     val error_text: String?,
     val id: String?,
